@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Dishes | Tasty Talk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='manage_dish.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <img class="input-icon" src="{{ url_for('static', filename='assets/logo.png') }}" alt="Tasty Talk Logo">
+      <ul class="nav">
+        <li><a href="/dashboard"><img src="{{ url_for('static', filename='assets/dashboard.png') }}">Dashboard</a></li>
+        <li><a href="/add_dish"><img src="{{ url_for('static', filename='assets/dish.png') }}">Add Dish</a></li>
+        <li><a href="/manage_dish"><img src="{{ url_for('static', filename='assets/manage.png') }}">Manage</a></li>
+        <li><a href="/manage_users"><img src="{{ url_for('static', filename='assets/user.png') }}">User</a></li>
+      </ul>
+      <div class="logout">
+        <a href="/logout"><img src="{{ url_for('static', filename='assets/logout.png') }}"> Logout</a>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Manage Dishes</h2>
+        <button onclick="openArchiveModal()" style="padding: 8px 12px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          View Archives
+        </button>
+      </div>
+
+      <!-- Filter Section -->
+      <form method="get" action="/manage_dish" style="margin: 20px 0;">
+        <label for="category_filter">Filter by Category:</label>
+        <select name="category" id="category_filter" onchange="this.form.submit()" style="margin-left: 10px; padding: 5px 10px; border-radius: 5px;">
+          <option value="">All</option>
+          <option value="Chicken" {% if selected_category == 'Chicken' %}selected{% endif %}>Chicken</option>
+          <option value="Pork" {% if selected_category == 'Pork' %}selected{% endif %}>Pork</option>
+          <option value="Beef" {% if selected_category == 'Beef' %}selected{% endif %}>Beef</option>
+          <option value="Fish" {% if selected_category == 'Fish' %}selected{% endif %}>Fish</option>
+          <option value="Vegetable" {% if selected_category == 'Vegetable' %}selected{% endif %}>Vegetable</option>
+          <option value="Noodles" {% if selected_category == 'Noodles' %}selected{% endif %}>Noodles</option>
+          <option value="Pasta" {% if selected_category == 'Pasta' %}selected{% endif %}>Pasta</option>
+        </select>
+      </form>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Dish Name</th>
+              <th>Category</th>
+              <th>Number of Servings</th>
+              <th>Estimated Duration</th>
+              <!-- <th>Ingredients</th>
+              <th>Procedures</th> -->
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dish in dishes %}
+            <tr>
+              <td><img src="{{ dish.imageUrl }}" alt="{{ dish.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"></td>
+              <td>{{ dish.name }}</td>
+              <td>{{ dish.category }}</td>
+              <td>{{ dish.servings }}</td>
+              <td>{{ dish.duration }}</td>
+              <!-- <td>
+                <ul>
+                  {% for item in dish.ingredients %}
+                    <li>{{ item.quantity }} {{ item.unit }} {{ item.name }}</li>
+                  {% endfor %}
+                </ul>
+              </td>
+              <td>
+                <ol>
+                  {% for step in dish.procedures %}
+                    <li>{{ step }}</li>
+                  {% endfor %}
+                </ol>
+              </td> -->
+              <td>
+                <button class="edit" data-dish='{{ dish | tojson | safe }}' onclick="openModal(this)">Edit</button>
+                <form action="/archive_dish/{{ dish.id }}" method="post" style="display:inline;" onsubmit="return confirm('Archive this dish?');">
+                  <button class="delete">Archive</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="modal-content" style="background:#fff; padding:20px; border-radius:10px; width:400px; max-height:90vh; overflow:auto;">
+    <span class="close-btn" onclick="closeModal()" style="float:right; cursor:pointer;">&times;</span>
+    <h3>Edit Dish</h3>
+    <form id="editForm" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="dish_id" id="dish_id">
+
+      <label>Dish Name</label>
+      <input type="text" name="name" id="dish_name" required>
+
+      <label>Number of Servings</label>
+      <input type="number" name="servings" id="dish_servings" required>
+
+      <label>Estimated Duration</label>
+      <input type="text" name="duration" id="dish_duration" required>
+
+      <!-- Category Field -->
+      <label>Category</label>
+      <select name="category" id="dish_category" required style="
+        width: 100%;
+        padding: 12px 14px;
+        margin: 8px 0 20px;
+        display: inline-block;
+        border: 2px solid black;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font-size: 16px;
+        font-family: inherit;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        appearance: none;
+        background-color: #fff;
+        cursor: pointer;
+      ">
+        <option value="" disabled selected>Select category</option>
+        <option value="Chicken">Chicken</option>
+        <option value="Pork">Pork</option>
+        <option value="Beef">Beef</option>
+        <option value="Fish">Fish</option>
+        <option value="Vegetable">Vegetable</option>
+        <option value="Noodles">Noodles</option>
+        <option value="Pasta">Pasta</option>
+      </select>
+
+      <label>Dish Image</label>
+      <input type="file" name="image" id="dish_image" accept="image/*" onchange="previewSelectedImage(event)">
+      <img id="previewImage" src="" alt="Preview" style="max-width: 100px; margin: 10px 0; display: block;">
+
+      <label>Ingredients (one per line: quantity unit name)</label>
+      <textarea name="ingredients" id="dish_ingredients" rows="5" required></textarea>
+
+      <label>Procedures (one step per line)</label>
+      <textarea name="procedures" id="dish_procedures" rows="5" required></textarea>
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Archive Modal -->
+<div id="archiveModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="modal-content" style="background:#fff; padding:20px; border-radius:10px; width:90%; max-height:90vh; overflow:auto;">
+    <span class="close-btn" onclick="closeArchiveModal()" style="float:right; cursor:pointer;">&times;</span>
+    <h3>Archived Dishes</h3>
+    {% if archived_dishes %}
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Dish Name</th>
+          <th>Servings</th>
+          <th>Duration</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dish in archived_dishes %}
+        <tr>
+          <td><img src="{{ dish.imageUrl }}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+          <td>{{ dish.name }}</td>
+          <td>{{ dish.servings }}</td>
+          <td>{{ dish.duration }}</td>
+          <td>
+            <form action="/unarchive_dish/{{ dish.id }}" method="post" onsubmit="return confirm('Unarchive this dish?');">
+              <button style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 4px;">Unarchive</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No archived dishes found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function openModal(button) {
+    const dish = JSON.parse(button.getAttribute('data-dish'));
+    document.getElementById('editModal').style.display = 'flex';
+
+    document.getElementById('dish_id').value = dish.id || '';
+    document.getElementById('dish_name').value = dish.name || '';
+    document.getElementById('dish_servings').value = dish.servings || '';
+    document.getElementById('dish_duration').value = dish.duration || '';
+    document.getElementById('previewImage').src = dish.imageUrl || '';
+    document.getElementById('dish_category').value = dish.category || '';
+
+    const ingredientsText = (dish.ingredients || []).map(item =>
+      `${item.quantity} ${item.unit} ${item.name}`
+    ).join('\n');
+    document.getElementById('dish_ingredients').value = ingredientsText;
+
+    const proceduresText = (dish.procedures || []).join('\n');
+    document.getElementById('dish_procedures').value = proceduresText;
+
+    document.getElementById('editForm').action = `/update_dish/${dish.id}`;
+  }
+
+  function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  function previewSelectedImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('previewImage').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function openArchiveModal() {
+    document.getElementById('archiveModal').style.display = 'flex';
+  }
+
+  function closeArchiveModal() {
+    document.getElementById('archiveModal').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
