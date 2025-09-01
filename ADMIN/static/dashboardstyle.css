@@ -1,0 +1,156 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 290px;
+  background-color: #F3642B;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Logo */
+.sidebar img.input-icon {
+  width: 180px;
+  height: auto;
+  margin-bottom: 30px;
+}
+
+.nav {
+  list-style: none;
+  width: 100%;
+}
+
+.nav li {
+  margin: 20px 0;
+  font-size: 30px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.nav li a {
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: bold;
+}
+
+.nav li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transform: translateX(5px);
+}
+
+.nav img {
+  width: 30px;
+  height: 30px;
+}
+
+/* LOGOUT */
+.logout {
+  display: flex;
+  align-items: center;  
+  justify-content: center;  
+  font-weight: bold;
+  cursor: pointer;
+  padding: 15px;
+  color: white;
+  text-align: center;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin-top: 50px;
+}
+
+.logout img {
+  width: 40px;
+  height: auto;
+  margin-right: 10px; 
+}
+.logout a {
+  text-decoration: none;
+  color: white;         
+  font-weight: bold;     
+  display: flex;         
+  align-items: center;
+}
+/* MAIN CONTENT */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+/* STATS BOXES */
+.stats {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 40px;
+}
+
+.stat-box {
+  flex: 1;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stat-box:hover {
+  transform: scale(1.02);
+}
+
+.stat-box h3 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.number {
+  font-size: 3em;
+  color: #FF6A00;
+}
+
+/* CHART */
+.chart {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.chart h3 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.chart img {
+  width: 600px;
+  max-width: 100%;
+  height: auto;
+}

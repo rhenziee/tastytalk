@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "315502318063",
+    "project_id": "tastytalk-66621",
+    "storage_bucket": "tastytalk-66621.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315502318063:android:37b8a5c523b7f7fddfe61a",
+        "android_client_info": {
+          "package_name": "com.example.tastytalk_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAveDHj9uxEeEwdXmOwKVRhLH_fdOrOedg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
