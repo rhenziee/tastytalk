@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Dishes | Tasty Talk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='manage_user.css') }}">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <img class="input-icon" src="{{ url_for('static', filename='assets/logo.png') }}" alt="Tasty Talk Logo">
+      <ul class="nav">
+        <li><a href="/dashboard"><img src="{{ url_for('static', filename='assets/dashboard.png') }}">Dashboard</a></li>
+        <li><a href="/add_dish"><img src="{{ url_for('static', filename='assets/dish.png') }}">Add Dish</a></li>
+        <li><a href="/manage_dish"><img src="{{ url_for('static', filename='assets/manage.png') }}">Manage</a></li>
+        <li><a href="/manage_users"><img src="{{ url_for('static', filename='assets/user.png') }}">User</a></li>
+      </ul>
+      <div class="logout" >
+        <a href="/logout" > <img src="{{ url_for('static', filename='assets/logout.png') }}"> Logout </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h2>Manage Users</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fullname</th>
+              <th>Birthday</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Username</th>
+              <th>Email</th>
+
+              <th>Cooking Skills Level</th>
+              
+          
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.birthday }}</td>
+                <td>{{ user.age }}</td>
+                <td>{{ user.gender }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.skill_level }}</td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+          
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
