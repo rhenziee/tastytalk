@@ -1,0 +1,117 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL (orange) */
+.left-panel {
+  background-color: #F3642B;
+  color: white;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-panel img {
+  width: 350px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.left-panel .title {
+  font-size: 18px;
+  letter-spacing: 3px;
+  margin-bottom: -20px;
+}
+
+.left-panel .logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 72px;
+  margin: 0;
+}
+
+.left-panel .subtitle {
+  font-size: 18px;
+  letter-spacing: 2px;
+  margin-top: -10px;
+}
+
+/* RIGHT PANEL (white with form) */
+.right-panel {
+  flex: 1;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* LOGIN FORM */
+.login-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px 12px 45px; /* Add space for the icon */
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  font-size: 14px;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  width: 20px;     /* Fix icon size */
+  height: 20px;    /* Fix icon size */
+  object-fit: contain;
+}
+
+
+/* TERMS CHECKBOX */
+.terms {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 5px;
+}
+
+/* LOGIN BUTTON */
+.login-btn {
+  background-color: #F45A2A;
+  width: 60%;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  align-self: center;
+}
+
+.login-btn:hover {
+  background-color: #d9481f;
+}
