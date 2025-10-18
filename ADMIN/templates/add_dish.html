@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add New Recipe</title>
+  <link rel="stylesheet" href="../static/add_dish.css" />
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCs3NODolbJv01MFOKtcOnKRIeyUTnhmbI",
+      authDomain: "tastytalk-66621.firebaseapp.com",
+      projectId: "tastytalk-66621",
+      storageBucket: "tastytalk-66621.appspot.com",
+      messagingSenderId: "315502318063",
+      appId: "1:315502318063:web:26e5c506214f1dacdfe61a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.firestoreDb = db;
+    window.firestoreAddDoc = addDoc;
+    window.firestoreCollection = collection;
+    window.firestoreServerTimestamp = serverTimestamp;
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <img class="input-icon" src="{{ url_for('static', filename='assets/logo.png') }}" alt="Logo">
+      <ul class="nav">
+        <li><a href="/dashboard"><img src="{{ url_for('static', filename='assets/dashboard.png') }}">Dashboard</a></li>
+        <li><a href="/add_dish"><img src="{{ url_for('static', filename='assets/dish.png') }}">Add Dish</a></li>
+        <li><a href="/manage_dish"><img src="{{ url_for('static', filename='assets/manage.png') }}">Manage</a></li>
+        <li><a href="/manage_users"><img src="{{ url_for('static', filename='assets/user.png') }}">User</a></li>
+      </ul>
+      <div class="logout">
+        <a href="/logout"><img src="{{ url_for('static', filename='assets/logout.png') }}"> Logout</a>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <h2>Add new recipe</h2>
+        <button class="publish-btn" id="submitRecipe">Publish</button>
+      </div>
+
+      <div class="content">
+        <div class="top-section">
+          <div class="upload-section">
+            <input type="file" id="imageUpload" accept="image/png, image/jpeg" style="display: none;" />
+            <label for="imageUpload" class="upload-box" id="uploadLabel">
+              <img id="previewImage" src="{{ url_for('static', filename='assets/upload_placeholder.png') }}" alt="Preview" style="max-width: 100%; display: none;" />
+              <p id="uploadText">Tap to Upload Photo</p>
+              <span id="uploadSubtext">PNG or JPEG (Max: 5MB)</span>
+              <button id="removeImageBtn" class="remove-image-btn">✖</button>
+            </label>
+          </div>
+
+          <div class="ingredients-section-wrapper">
+            <label>Ingredients</label>
+            <div class="ingredients-section"></div>
+            <button class="add-btn add-ingredient-btn" type="button">+ Add Ingredients</button>
+          </div>
+        </div>
+
+        <div class="bottom-section">
+          <div class="form-section">
+            <label>Recipe Name</label>
+            <input type="text" id="recipeName" placeholder="Enter recipe name">
+
+            <label>Category</label>
+            <select id="recipeCategory" style="width: 100%; padding: 12px 14px; margin: 8px 0 20px; border: 2px solid black; border-radius: 10px;">
+              <option value="" disabled selected>Select category</option>
+              <option value="Chicken">Chicken</option>
+              <option value="Pork">Pork</option>
+              <option value="Beef">Beef</option>
+              <option value="Fish">Fish</option>
+              <option value="Vegetable">Vegetable</option>
+              <option value="Noodles">Noodles</option>
+              <option value="Pasta">Pasta</option>
+            </select>
+
+            <label>Number of servings</label>
+            <input type="text" id="servings" placeholder="Ex: 4">
+
+            <label>Estimated Duration</label>
+            <input type="text" id="duration" placeholder="Ex: 45 minutes">
+
+            <!-- SOURCE FIELD -->
+            <label>Recipe Source</label>
+            <input type="text" id="recipeSource" placeholder="Ex: Panlasang Pinoy, Lola’s Recipe, etc.">
+          </div>
+
+          <div class="procedure-section">
+            <label>Procedure</label>
+            <div class="procedure-list">
+              <div class="procedure-row">
+                <span>01</span>
+                <input type="text" placeholder="Procedure step">
+              </div>
+            </div>
+            <button class="add-btn" type="button">+ Add Procedure</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const imageUploadInput = document.getElementById('imageUpload');
+      const previewImage = document.getElementById('previewImage');
+      const uploadText = document.getElementById('uploadText');
+      const uploadSubtext = document.getElementById('uploadSubtext');
+      const removeImageBtn = document.getElementById('removeImageBtn');
+
+      imageUploadInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            uploadText.style.display = 'none';
+            uploadSubtext.style.display = 'none';
+            removeImageBtn.style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      removeImageBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        imageUploadInput.value = '';
+        previewImage.src = '';
+        previewImage.style.display = 'none';
+        uploadText.style.display = 'block';
+        uploadSubtext.style.display = 'block';
+        this.style.display = 'none';
+      });
+
+      const addIngredientBtn = document.querySelector('.add-ingredient-btn');
+      addIngredientBtn.addEventListener('click', function () {
+        const ingredientRow = document.createElement('div');
+        ingredientRow.classList.add('ingredient-row');
+
+        const quantityGroup = document.createElement('div');
+        quantityGroup.classList.add('quantity-group');
+
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'text';
+        quantityInput.placeholder = 'Enter quantity';
+
+        const select = document.createElement('select');
+        ['pcs', 'cups', 'tablespoons', 'teaspoons', 'ml', 'grams', 'kilograms', 'lbs', 'bunch', 'oz'].forEach(unit => {
+          const option = document.createElement('option');
+          option.value = unit;
+          option.textContent = unit;
+          select.appendChild(option);
+        });
+
+        quantityGroup.appendChild(quantityInput);
+        quantityGroup.appendChild(select);
+
+        const ingredientNameInput = document.createElement('input');
+        ingredientNameInput.type = 'text';
+        ingredientNameInput.placeholder = 'Enter ingredient name';
+
+        const substituteInput = document.createElement('input');
+        substituteInput.type = 'text';
+        substituteInput.placeholder = 'Enter alternatives (comma-separated)';
+        substituteInput.classList.add('substitute-input');
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '✖';
+        removeBtn.classList.add('remove-btn');
+        removeBtn.addEventListener('click', () => ingredientRow.remove());
+
+        ingredientRow.appendChild(quantityGroup);
+        ingredientRow.appendChild(ingredientNameInput);
+        ingredientRow.appendChild(substituteInput);
+        ingredientRow.appendChild(removeBtn);
+
+        document.querySelector('.ingredients-section').appendChild(ingredientRow);
+      });
+
+      // Auto-add one row at start
+      addIngredientBtn.click();
+
+      function updateProcedureSteps() {
+        document.querySelectorAll('.procedure-row span').forEach((span, i) => {
+          span.textContent = (i + 1).toString().padStart(2, '0');
+        });
+      }
+
+      document.querySelector('.procedure-section .add-btn').addEventListener('click', function () {
+        const procedureRow = document.createElement('div');
+        procedureRow.classList.add('procedure-row');
+
+        const stepNumber = document.createElement('span');
+        stepNumber.textContent = '00';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Procedure step';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '✖';
+        removeBtn.classList.add('remove-btn');
+        removeBtn.addEventListener('click', () => {
+          const allRows = document.querySelectorAll('.procedure-row');
+          if (allRows.length > 1) {
+            procedureRow.remove();
+            updateProcedureSteps();
+          } else {
+            alert('At least one procedure step is required.');
+          }
+        });
+
+        procedureRow.appendChild(stepNumber);
+        procedureRow.appendChild(input);
+        procedureRow.appendChild(removeBtn);
+        document.querySelector('.procedure-list').appendChild(procedureRow);
+        updateProcedureSteps();
+      });
+
+      document.getElementById('submitRecipe').addEventListener('click', async function () {
+        const name = document.getElementById('recipeName').value;
+        const category = document.getElementById('recipeCategory').value;
+        const servings = document.getElementById('servings').value;
+        const duration = document.getElementById('duration').value;
+        const source = document.getElementById('recipeSource').value; 
+        const imageFile = imageUploadInput.files[0];
+
+        if (!name || !category || !imageFile) {
+          return alert("Please fill out all required fields including category and upload an image.");
+        }
+
+        const ingredients = [];
+        document.querySelectorAll('.ingredient-row').forEach(row => {
+          const quantity = row.querySelector('input[type="text"]').value;
+          const unit = row.querySelector('select').value;
+          const inputs = row.querySelectorAll('input[type="text"]');
+          const ingredientName = inputs[1].value;
+          const alternatives = inputs[2].value
+            .split(',')
+            .map(str => str.trim())
+            .filter(str => str.length > 0);
+
+          if (quantity && ingredientName) {
+            ingredients.push({
+              quantity,
+              unit,
+              name: ingredientName,
+              substitutes: alternatives
+            });
+          }
+        });
+
+        const procedures = [];
+        document.querySelectorAll('.procedure-row input').forEach(input => {
+          if (input.value.trim()) procedures.push(input.value.trim());
+        });
+
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        formData.append("upload_preset", "tastytalk_unsigned");
+
+        try {
+          const cloudinaryRes = await fetch("https://api.cloudinary.com/v1_1/dhhvbvxsl/image/upload", {
+            method: "POST",
+            body: formData
+          });
+          const cloudinaryData = await cloudinaryRes.json();
+          const imageUrl = cloudinaryData.secure_url;
+
+          await firestoreAddDoc(firestoreCollection(firestoreDb, "dishes"), {
+            name,
+            category,
+            servings,
+            duration,
+            source,
+            imageUrl,
+            ingredients,
+            procedures,
+            createdAt: firestoreServerTimestamp(),
+            
+          });
+
+          await firestoreAddDoc(firestoreCollection(firestoreDb, "notifications"), {
+            title: "New Recipe Added!",
+            message: `Check out our new dish: ${name}`,
+            timestamp: firestoreServerTimestamp()
+          });
+
+          alert("Dish added successfully!");
+          location.reload();
+        } catch (err) {
+          console.error("Upload failed:", err);
+          alert("Failed to upload recipe.");
+        }
+      });
+
+      updateProcedureSteps();
+    });
+  </script>
+</body>
+</html>
