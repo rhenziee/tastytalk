@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tasty Talk Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <img class="input-icon" src="{{ url_for('static', filename='assets/logo.png') }}" alt="Tasty Talk Logo">
+      <ul class="nav">
+        <li><a href="/dashboard"><img src="{{ url_for('static', filename='assets/dashboard.png') }}">Dashboard</a></li>
+        <li><a href="/add_dish"><img src="{{ url_for('static', filename='assets/dish.png') }}">Add Dish</a></li>
+        <li><a href="/manage_dish"><img src="{{ url_for('static', filename='assets/manage.png') }}">Manage</a></li>
+        <li><a href="/manage_users"><img src="{{ url_for('static', filename='assets/user.png') }}">User</a></li>
+      </ul>
+      <div class="logout" >
+        <a href="/logout" > <img src="{{ url_for('static', filename='assets/logout.png') }}"> Logout </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1>Dashboard</h1>
+        
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Total Dishes</h3>
+            <div class="stat-icon dishes-icon"></div>
+          </div>
+          <div class="stat-number">{{ num_dishes }}</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Active Users</h3>
+            <div class="stat-icon users-icon"></div>
+          </div>
+          <div class="stat-number">{{ num_users }}</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Average Rating</h3>
+            <div class="stat-icon rating-icon"></div>
+          </div>
+          <div class="stat-number">4.2</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Chart Section -->
+        <div class="chart-section">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>User Feedback </h3>
+              <p></p>
+            </div>
+            <div class="chart-container">
+              <canvas id="feedbackChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-section">
+          <div class="activity-card">
+            <div class="activity-header">
+              <h3>Recent Activity</h3>
+      
+            </div>
+            <div class="activity-list">
+              {% if admin_activities %}
+                {% for activity in admin_activities %}
+                  <div class="activity-item">
+                    <div class="activity-icon">{{ activity.icon }}</div>
+                    <div class="activity-content">
+                      <p>{{ activity.action }}</p>
+                      <span class="activity-time">{{ activity.timestamp }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="activity-item">
+                  <div class="activity-icon">✏️</div>
+                  <div class="activity-content">
+                    <p><strong>Updated dish:</strong></p>
+                    <span class="activity-time"></span>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Script -->
+<script>
+  const feedbackLabels = JSON.parse('{{ feedback_labels | tojson | safe }}');
+  const feedbackRatings = JSON.parse('{{ feedback_ratings | tojson | safe }}');
+
+  const ctx = document.getElementById('feedbackChart').getContext('2d');
+  const feedbackChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: feedbackLabels,
+      datasets: [{
+        label: 'Average Rating',
+        data: feedbackRatings,
+        backgroundColor: 'rgba(243, 100, 43, 0.2)',
+        borderColor: '#F3642B',
+        borderWidth: 3,
+        pointBackgroundColor: '#F3642B',
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 5,
+          title: {
+            display: true,
+            text: 'Rating (Stars)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Day'
+          }
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
